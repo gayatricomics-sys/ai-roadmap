@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Engineering Learning Roadmap</title>
+<style>
+  :root{
+    --paper:#f4efe4; --card:#fffdf7; --ink:#1d1b16; --muted:#6b6458;
+    --line:#d9cfbc; --build:#e2572b; --serve:#1f6f6a; --secure:#3b3fb5;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+    --sans:"Avenir Next","Avenir","Segoe UI","Helvetica Neue",sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.5;
+    background-image:radial-gradient(rgba(0,0,0,.035) 1px,transparent 1px);background-size:18px 18px;padding-bottom:80px}
+  a{color:inherit}
+  .wrap{max-width:1180px;margin:0 auto;padding:40px 28px}
+
+  header{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:32px;align-items:end;border-bottom:2px solid var(--ink);padding-bottom:28px}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,6vw,76px);line-height:.95;letter-spacing:-.02em;margin:10px 0 14px}
+  h1 em{font-style:italic;color:var(--build)}
+  .lede{max-width:620px;color:var(--muted);font-size:16px}
+  .ring{position:relative;width:200px;height:200px;justify-self:end}
+  .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+  .ring .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .ring .num b{font-family:var(--serif);font-weight:400;font-size:52px;line-height:1}
+  .ring .num span{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:26px 0 8px}
+  .chip{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;border:1.5px solid var(--ink);background:transparent;padding:8px 14px;cursor:pointer;color:var(--ink);transition:all .15s}
+  .chip:hover{transform:translateY(-1px)}
+  .chip.on{background:var(--ink);color:var(--paper)}
+  .chip .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:1px}
+  .search{margin-left:auto;font-family:var(--sans);font-size:14px;border:1.5px solid var(--ink);background:var(--card);padding:8px 12px;width:240px;outline:none}
+  .reset{font-family:var(--mono);font-size:11px;color:var(--muted);background:none;border:none;text-decoration:underline;cursor:pointer}
+
+  .tracks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:22px 0 36px}
+  .track{background:var(--card);border:1.5px solid var(--ink);padding:16px 18px;position:relative;overflow:hidden}
+  .track h3{font-family:var(--serif);font-weight:400;font-size:22px}
+  .track p{font-size:13px;color:var(--muted)}
+  .bar{height:6px;background:var(--line);margin-top:12px}
+  .bar i{display:block;height:100%;width:0;transition:width .4s ease}
+  .track .count{position:absolute;top:14px;right:16px;font-family:var(--mono);font-size:12px}
+
+  .timeline{position:relative;padding-left:120px}
+  .timeline:before{content:"";position:absolute;left:92px;top:8px;bottom:8px;width:2px;background:var(--ink)}
+  .phase{position:relative;margin-bottom:28px;opacity:0;transform:translateY(14px);animation:rise .5s ease forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
+  .phase .weeks{position:absolute;left:-120px;top:4px;width:80px;text-align:right;font-family:var(--mono);font-size:12px;line-height:1.3;color:var(--muted)}
+  .phase .weeks b{display:block;font-family:var(--serif);font-weight:400;font-size:30px;color:var(--ink)}
+  .phase .node{position:absolute;left:-36px;top:12px;width:16px;height:16px;border:2px solid var(--ink);background:var(--paper);border-radius:50%;transition:background .2s}
+  .phase.complete .node{background:var(--ink)}
+  .pcard{background:var(--card);border:1.5px solid var(--ink);box-shadow:5px 5px 0 var(--ink)}
+  .phead{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:16px 20px;border-bottom:1px dashed var(--line);cursor:pointer}
+  .phead h2{font-family:var(--serif);font-weight:400;font-size:26px;letter-spacing:-.01em}
+  .phead .goal{font-size:13px;color:var(--muted);margin-top:2px}
+  .phead .pc{font-family:var(--mono);font-size:12px;white-space:nowrap}
+  .pbody{padding:6px 20px 16px}
+  .phase.collapsed .pbody{display:none}
+
+  .res{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:12px;align-items:start;padding:12px 0;border-bottom:1px solid #efe7d6}
+  .res:last-child{border-bottom:none}
+  .res.hide{display:none}
+  .check{appearance:none;width:22px;height:22px;border:1.5px solid var(--ink);background:var(--card);cursor:pointer;margin-top:2px;position:relative}
+  .check:checked{background:var(--ink)}
+  .check:checked:after{content:"";position:absolute;left:6px;top:2px;width:6px;height:11px;border:solid var(--paper);border-width:0 2px 2px 0;transform:rotate(45deg)}
+  .res .t{font-size:15px;font-weight:600}
+  .res .t a{text-decoration:none;border-bottom:1.5px solid currentColor}
+  .res .t a:hover{color:var(--build)}
+  .res .d{font-size:13.5px;color:var(--muted)}
+  .res.done .t,.res.done .d{text-decoration:line-through;opacity:.5}
+  .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border:1.5px solid;white-space:nowrap}
+  .tag.build{color:var(--build)} .tag.serve{color:var(--serve)} .tag.secure{color:var(--secure)} .tag.project{color:var(--ink);background:#f1e6cf;border-color:var(--ink)}
+
+  .note{margin-top:30px;border-top:2px solid var(--ink);padding-top:16px;font-size:13px;color:var(--muted);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+
+  @media (max-width:760px){
+    header{grid-template-columns:1fr}.ring{justify-self:start;width:150px;height:150px}.ring .num b{font-size:38px}
+    .tracks{grid-template-columns:1fr}.timeline{padding-left:28px}.timeline:before{left:6px}
+    .phase .weeks{position:static;text-align:left;width:auto;margin-bottom:6px}.phase .weeks b{display:inline;font-size:20px;margin-right:6px}
+    .phase .node{left:-29px}.search{margin-left:0;width:100%}
+  }
+  @media print{
+    .controls,.reset{display:none}.phase{opacity:1;transform:none;animation:none;break-inside:avoid}
+    .phase.collapsed .pbody{display:block}.pcard{box-shadow:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="kicker">Self-study roadmap · 14 weeks · free resources</div>
+      <h1>From noob to<br><em>AI engineer.</em></h1>
+      <p class="lede">Official docs, free courses and legal practice labs, in the order to work through them. Tick items as you finish; your progress is saved in this browser.</p>
+    </div>
+    <div class="ring">
+      <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="#d9cfbc" stroke-width="8"/>
+        <circle id="ringArc" cx="50" cy="50" r="42" fill="none" stroke="#1d1b16" stroke-width="8" stroke-dasharray="263.9" stroke-dashoffset="263.9" style="transition:stroke-dashoffset .5s ease"/></svg>
+      <div class="num"><b id="pct">0%</b><span id="pctSub">0 of 0 done</span></div>
+    </div>
+  </header>
+
+  <div class="controls" id="controls">
+    <button class="chip on" data-f="all">All</button>
+    <button class="chip" data-f="build"><span class="dot" style="background:var(--build)"></span>Build with AI</button>
+    <button class="chip" data-f="serve"><span class="dot" style="background:var(--serve)"></span>Serve &amp; fine-tune</button>
+    <button class="chip" data-f="secure"><span class="dot" style="background:var(--secure)"></span>Security</button>
+    <button class="chip" data-f="todo">Not done</button>
+    <input class="search" id="search" placeholder="Search resources…">
+  </div>
+
+  <div class="tracks" id="tracks"></div>
+  <div class="timeline" id="timeline"></div>
+
+  <div class="note">
+    <span>Practise security only on labs built for it, or on systems you own or have written permission to test.</span>
+    <button class="reset" id="reset">Reset progress</button>
+  </div>
+</div>
+
+<script>
+const TRACKS = {
+  build:{name:"Build with AI",desc:"Specs, agents, MCP",color:"var(--build)"},
+  serve:{name:"Serve & fine-tune",desc:"vLLM, SGLang, Hugging Face",color:"var(--serve)"},
+  secure:{name:"Security",desc:"OWASP, ATLAS, legal labs",color:"var(--secure)"}
+};
+const PHASES = [
+  {weeks:"1–2",title:"Fundamentals",goal:"Understand how LLMs and transformers work.",items:[
+    {id:"hf-llm",track:"serve",t:"Hugging Face LLM Course",url:"https://huggingface.co/huggingface-course",d:"Work through the opening chapters: transformers, tokenizers, using pretrained models."}
+  ]},
+  {weeks:"3–4",title:"Spec-driven building",goal:"Ship one small app with a spec and a coding agent.",items:[
+    {id:"spk-docs",track:"build",t:"GitHub Spec Kit docs",url:"https://github.github.com/spec-kit/",d:"Read what spec-driven development is and why it beats ad-hoc prompting."},
+    {id:"spk-qs",track:"build",t:"Spec Kit Quickstart",url:"https://github.github.com/spec-kit/quickstart.html",d:"Follow the flow: constitution → specify → clarify → plan → tasks → implement."},
+    {id:"spk-repo",track:"build",t:"Spec Kit repository",url:"https://github.com/github/spec-kit",d:"Browse templates and examples; star it to follow updates."},
+    {id:"cc-ov",track:"build",t:"Claude Code overview",url:"https://code.claude.com/docs/en/overview",d:"What the terminal agent can do and how to install it."},
+    {id:"cc-how",track:"build",t:"How Claude Code works",url:"https://code.claude.com/docs/en/how-claude-code-works",d:"The agent loop, context and permissions explained."},
+    {id:"cc-qs",track:"build",t:"Claude Code quickstart",url:"https://code.claude.com/docs/en/quickstart",d:"Run your first real task in a repo."},
+    {id:"codex",track:"build",t:"OpenAI Codex learning hub",url:"https://developers.openai.com/learn/codex",d:"Compare Codex's workflow with Claude Code's."},
+    {id:"p-app",track:"build",project:true,t:"Project: build a to-do or notes app from a spec",d:"Write the spec first, let the agent implement, then review every diff."}
+  ]},
+  {weeks:"5–6",title:"Connecting tools with MCP",goal:"Build and secure one MCP server.",items:[
+    {id:"mcp-intro",track:"build",t:"What is MCP?",url:"https://modelcontextprotocol.io/docs/2026-07-28/getting-started/intro",d:"The 'USB-C port for AI': hosts, clients and servers."},
+    {id:"mcp-tools",track:"build",t:"MCP spec: Tools",url:"https://modelcontextprotocol.io/specification/2026-07-28/server/tools",d:"How servers expose tools and how clients call them."},
+    {id:"cursor-mcp",track:"build",t:"Cursor: MCP setup",url:"https://cursor.com/docs/context/mcp",d:"Connect your server to an IDE agent."},
+    {id:"p-mcp",track:"build",project:true,t:"Project: an MCP server with two tools",d:"For example, read notes and search notes. Then read the MCP security pages and fix what applies."}
+  ]},
+  {weeks:"7–8",title:"Agents",goal:"Understand agent design end to end.",items:[
+    {id:"hf-agents",track:"serve",t:"Hugging Face AI Agents Course",url:"https://huggingface.co/learn/agents-course/en/unit0/introduction",d:"Free course on how agents reason, use tools and get evaluated."},
+    {id:"p-agent",track:"build",project:true,t:"Project: an agent that uses your MCP server",d:"Add logging of every tool call so you can see what it did."}
+  ]},
+  {weeks:"9–10",title:"Serving models",goal:"Run an open model behind your own API.",items:[
+    {id:"vllm",track:"serve",t:"vLLM documentation",url:"https://docs.vllm.ai/",d:"Quickstart: serve an open model with an OpenAI-compatible API on one GPU."},
+    {id:"sglang",track:"serve",t:"SGLang repository",url:"https://github.com/sgl-project/sglang",d:"Follow the repo's link to current docs; compare throughput with vLLM."},
+    {id:"p-serve",track:"serve",project:true,t:"Project: benchmark two engines",d:"Same model, same prompts. Record latency and tokens per second."}
+  ]},
+  {weeks:"11–12",title:"Fine-tuning",goal:"Train a small model on your own examples.",items:[
+    {id:"hf-sft",track:"serve",t:"Supervised Fine-Tuning chapter",url:"https://huggingface.co/learn/llm-course/en/chapter11/1",d:"Hands-on fine-tuning with the Hugging Face stack."},
+    {id:"p-ft",track:"serve",project:true,t:"Project: fine-tune and compare",d:"Score base vs fine-tuned on 50 held-out examples."}
+  ]},
+  {weeks:"13–14",title:"Security, defensively",goal:"Know the risks and practise only in legal labs.",items:[
+    {id:"owasp",track:"secure",t:"OWASP Top 10 for LLM Applications",url:"https://owasp.org/projects/top-10-for-large-language-model-applications",d:"The standard list of AI app risks, each with mitigations."},
+    {id:"atlas",track:"secure",t:"MITRE ATLAS",url:"https://atlas.mitre.org/",d:"Real-world case studies of attacks on AI systems and how they were mitigated."},
+    {id:"gandalf",track:"secure",t:"Lakera Gandalf",url:"https://play.lakera.ai/",d:"Beginner game: see how defences get stronger level by level."},
+    {id:"ps-llm",track:"secure",t:"PortSwigger: Web LLM attacks",url:"https://portswigger.net/web-security/llm-attacks",d:"Free legal labs plus a clear section on defending LLM apps."},
+    {id:"ps-academy",track:"secure",t:"PortSwigger Web Security Academy",url:"https://portswigger.net/web-security",d:"Core web security, the foundation AI app security sits on."},
+    {id:"p-sec",track:"secure",project:true,t:"Project: harden your own app",d:"Map your earlier projects against the OWASP list and fix the gaps you find."}
+  ]}
+];
+
+const KEY="ai-roadmap-progress";
+let done={}; try{done=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}};
+let filter="all", query="";
+
+function render(){
+  const tl=document.getElementById("timeline"); tl.innerHTML="";
+  PHASES.forEach((p,i)=>{
+    const el=document.createElement("section");
+    const n=p.items.filter(x=>done[x.id]).length;
+    el.className="phase"+(n===p.items.length?" complete":"");
+    el.style.animationDelay=(i*70)+"ms";
+    el.innerHTML=`<div class="weeks"><b>${String(i+1).padStart(2,"0")}</b>Weeks ${p.weeks}</div><div class="node"></div>
+      <div class="pcard"><div class="phead"><div><h2>${p.title}</h2><div class="goal">${p.goal}</div></div><div class="pc">${n}/${p.items.length}</div></div><div class="pbody"></div></div>`;
+    const body=el.querySelector(".pbody");
+    let visible=0;
+    p.items.forEach(it=>{
+      const row=document.createElement("div");
+      const match=(filter==="all"||filter===it.track||(filter==="todo"&&!done[it.id]))&&
+        (!query||(it.t+" "+it.d).toLowerCase().includes(query));
+      if(match)visible++;
+      row.className="res"+(done[it.id]?" done":"")+(match?"":" hide");
+      const title=it.url?`<a href="${it.url}" target="_blank" rel="noopener">${it.t} ↗</a>`:it.t;
+      row.innerHTML=`<input type="checkbox" class="check" ${done[it.id]?"checked":""} aria-label="Mark ${it.t} done">
+        <div><div class="t">${title}</div><div class="d">${it.d}</div></div>
+        <span class="tag ${it.project?"project":it.track}">${it.project?"Project":TRACKS[it.track].name}</span>`;
+      row.querySelector("input").addEventListener("change",e=>{done[it.id]=e.target.checked;if(!e.target.checked)delete done[it.id];save();render()});
+      body.appendChild(row);
+    });
+    el.querySelector(".phead").addEventListener("click",()=>el.classList.toggle("collapsed"));
+    if(visible===0)el.style.display="none";
+    tl.appendChild(el);
+  });
+  const all=PHASES.flatMap(p=>p.items), d=all.filter(x=>done[x.id]).length, pct=Math.round(d/all.length*100);
+  document.getElementById("pct").textContent=pct+"%";
+  document.getElementById("pctSub").textContent=`${d} of ${all.length} done`;
+  document.getElementById("ringArc").style.strokeDashoffset=263.9*(1-d/all.length);
+  const tr=document.getElementById("tracks"); tr.innerHTML="";
+  Object.entries(TRACKS).forEach(([k,v])=>{
+    const its=all.filter(x=>x.track===k), dd=its.filter(x=>done[x.id]).length;
+    tr.insertAdjacentHTML("beforeend",`<div class="track"><span class="count">${dd}/${its.length}</span><h3>${v.name}</h3><p>${v.desc}</p><div class="bar"><i style="width:${its.length?dd/its.length*100:0}%;background:${v.color}"></i></div></div>`);
+  });
+}
+document.getElementById("controls").addEventListener("click",e=>{
+  const b=e.target.closest(".chip"); if(!b)return;
+  document.querySelectorAll(".chip").forEach(c=>c.classList.remove("on")); b.classList.add("on");
+  filter=b.dataset.f; render();
+});
+document.getElementById("search").addEventListener("input",e=>{query=e.target.value.trim().toLowerCase();render()});
+document.getElementById("reset").addEventListener("click",()=>{if(confirm("Clear all progress?")){done={};save();render()}});
+render();
+</script>
+</body>
+</html>
